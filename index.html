@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Contador Mágico de Palabras</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
   <style>
@@ -11,7 +11,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; margin:0;
+      height: 100vh;
+      margin: 0;
     }
     .contenedor {
       position: relative;
@@ -19,51 +20,89 @@
       max-width: 90%;
     }
     .contenedor img {
-      width: 100%; display: block;
+      width: 100%;
+      display: block;
     }
     #pantalla {
-      position: absolute; top:95px; left:50px;
-      width:400px; height:120px;
-      padding:10px;
-      font-size:1em; color:#000;
-      white-space:pre-line;
+      position: absolute;
+      top: 95px;
+      left: 50px;
+      width: 400px;
+      height: 120px;
+      padding: 10px;
+      font-size: 1em;
+      color: #000;
+      white-space: pre-line;
     }
-    #botonContar, #botonReiniciar {
-      position:absolute; width:90px; height:90px;
-      background:transparent; border:none; cursor:pointer;
+    #botonContar,
+    #botonReiniciar {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
     }
     #botonContar {
-      bottom:40px; right:45px;
+      bottom: 40px;
+      right: 45px;
     }
     #botonReiniciar {
-      bottom:40px; left:45px;
+      bottom: 40px;
+      left: 45px;
     }
   </style>
 </head>
 <body>
   <div class="contenedor">
-    <img src="contador_magico_resultado.png" alt="Contador">
+    <img src="contador_magico_resultado.png" alt="Contador Mágico de Palabras">
     <div id="pantalla"></div>
-    <button id="botonContar"></button>
-    <button id="botonReiniciar"></button>
+    <button id="botonContar" aria-label="Contar palabras"></button>
+    <button id="botonReiniciar" aria-label="Reiniciar contador"></button>
   </div>
-<script>
-  const pantalla=document.getElementById('pantalla');
-  const contar=document.getElementById('botonContar');
-  const reiniciar=document.getElementById('botonReiniciar');
-  let recognition;
-  if('webkitSpeechRecognition' in window){
-    recognition=new webkitSpeechRecognition();
-    recognition.lang='es-ES';
-    recognition.onstart=()=>pantalla.textContent="Escuchando...";
-    recognition.onresult=(e)=>{
-      let txt=e.results[0][0].transcript;
-      let palabras=txt.split(' ').length;
-      pantalla.textContent=`Has leído ${palabras} palabras.\n"${txt}"`;
+
+  <script>
+    const pantalla = document.getElementById("pantalla");
+    const botonContar = document.getElementById("botonContar");
+    const botonReiniciar = document.getElementById("botonReiniciar");
+
+    let recognition;
+    let startTime;
+
+    if ("webkitSpeechRecognition" in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = "es-ES";
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        startTime = Date.now();
+        pantalla.textContent = "🗣️ Escuchando...";
+      };
+
+      recognition.onresult = (event) => {
+        const endTime = Date.now();
+        const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+        const transcript = event.results[0][0].transcript;
+        const wordCount = transcript.trim().split(/\s+/).length;
+
+        pantalla.textContent = `Has leído ${wordCount} palabras\nen ${timeTaken} segundos.\n\n"${transcript}"`;
+      };
+
+    recognition.onerror = () => {
+  pantalla.textContent = "Ups… no te hemos oído bien. Inténtalo otra vez 😊";
+};
+
+    } else {
+      pantalla.textContent = "Este navegador no soporta reconocimiento de voz. Usa Google Chrome.";
+    }
+
+    botonContar.onclick = () => {
+      if (recognition) recognition.start();
     };
-  }else{pantalla.textContent="No soportado.";}
-  contar.onclick=()=>recognition.start();
-  reiniciar.onclick=()=>pantalla.textContent='';
-</script>
+
+    botonReiniciar.onclick = () => {
+      pantalla.textContent = "";
+    };
+  </script>
 </body>
 </html>
